@@ -2,6 +2,7 @@ import org.junit.jupiter.api.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -15,15 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * This chapter will introduce you to the basics of Reactor.
  * You will learn how to retrieve result from Mono and Flux
  * in different ways.
- *
+ * <p>
  * Read first:
- *
+ * <p>
  * https://projectreactor.io/docs/core/release/reference/#intro-reactive
  * https://projectreactor.io/docs/core/release/reference/#reactive.subscribe
  * https://projectreactor.io/docs/core/release/reference/#_subscribe_method_examples
- *
+ * <p>
  * Useful documentation:
- *
+ * <p>
  * https://projectreactor.io/docs/core/release/reference/#which-operator
  * https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Mono.html
  * https://projectreactor.io/docs/core/release/api/reactor/core/publisher/Flux.html
@@ -33,15 +34,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class c1_Introduction extends IntroductionBase {
 
     /**
-     * Every journey starts with Hello World!
-     * As you may know, Mono represents asynchronous result of 0-1 element.
-     * Retrieve result from this Mono by blocking indefinitely or until a next signal is received.
+     * every journey starts with hello world!
+     * as you may know, mono represents asynchronous result of 0-1 element.
+     * retrieve result from this mono by blocking indefinitely or until a next signal is received.
      */
     @Test
     public void hello_world() {
         Mono<String> serviceResult = hello_world_service();
 
-        String result = null; //todo: change this line only
+        String result = serviceResult.block();
 
         assertEquals("Hello World!", result);
     }
@@ -55,7 +56,7 @@ public class c1_Introduction extends IntroductionBase {
         Exception exception = assertThrows(IllegalStateException.class, () -> {
             Mono<String> serviceResult = unresponsiveService();
 
-            String result = null; //todo: change this line only
+            String result = serviceResult.block(Duration.ofSeconds(1));
         });
 
         String expectedMessage = "Timeout on blocking read for 1";
@@ -72,7 +73,7 @@ public class c1_Introduction extends IntroductionBase {
     public void empty_service() {
         Mono<String> serviceResult = emptyService();
 
-        Optional<String> optionalServiceResult = null; //todo: change this line only
+        Optional<String> optionalServiceResult = serviceResult.blockOptional();
 
         assertTrue(optionalServiceResult.isEmpty());
         assertTrue(emptyServiceIsCalled.get());
@@ -81,7 +82,7 @@ public class c1_Introduction extends IntroductionBase {
     /**
      * Many services return more than one result and best services supports streaming!
      * It's time to introduce Flux, an Asynchronous Sequence of 0-N Items.
-     *
+     * <p>
      * Service we are calling returns multiple items, but we are interested only in the first one.
      * Retrieve first item from this Flux by blocking indefinitely until a first item is received.
      */
